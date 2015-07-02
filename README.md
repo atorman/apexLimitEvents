@@ -2,7 +2,9 @@
 
 Apex runs in a multitenant environment. The Apex runtime engine strictly enforces limits to ensure that runaway Apex doesn’t monopolize shared resources. If some Apex code ever exceeds a limit, the associated governor issues a run-time exception that cannot be handled. Apex limits are defined in the [Salesforce documentation](https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_gov_limits.htm). 
 
-This repository contains a force.com project that allows you to visualize and test ApexLimitEvents. Apex Limit Events, currently in pilot (contact your salesforce account executive to be nominated for the pilot program), provides visibility into the state and health of your Apex executions in production. It consists of near real-time events and hourly roll-up aggregate metrics. Each event consists of key information about the Apex execution in the context of a limit including:
+This repository contains a force.com project that allows you to visualize and test ApexLimitEvents. Apex Limit Events, currently in pilot (contact your salesforce account executive to be nominated for the pilot program), provides visibility into the state and health of your Apex executions in production. It consists of near real-time events and hourly roll-up aggregate metrics. 
+
+Each event consists of key information about the Apex execution in the context of a limit including:
 
 * EntryPointId
 * EntryPointName
@@ -16,6 +18,14 @@ This repository contains a force.com project that allows you to visualize and te
 * UserId
 * Username
 
+Each hourly metric consists of key aggregate information including: 
+* Distinct Number of Apex Transactions
+* Distinct Number of Apex Transactions With Limits Exceeding 60% Threshold
+* Distinct Number of Apex Transactions With Limits Exceeding 60% Threshold By Entry Point Name
+* Distinct Number of Apex Transactions With Limits Exceeding 60% Threshold By Limit Type
+* Average Limit Value By Entry Point Name
+* Average Limit Value By Limit Type
+
 To learn more specifics about the Apex Limit Events Pilot functionality, read the pilot [tip sheet](http://bit.ly/apexLimits).
 
 ## Installation
@@ -26,7 +36,7 @@ The easiest way to install this project into your org is to make use of the work
 
 1. Download a ZIP of the repository. 
 2. Uncompress the files. Find the src folder with the package.xml file in it. Re-zip it on the command line: 
-```zip -r deploy.zip src.```
+```zip -r deploy.zip src```
 3. Open Workbench (http://workbench.developerforce.com/) 
 4. Login to the desired organization with a user that has Modify All Data.  
 5. Select *Deploy* from the *migration* menu and when prompted, choose your zip file and select 'Allow Missing Files' checkbox before deploying it.
@@ -53,4 +63,4 @@ Contributors include:
 This repo is As-Is. All pull requests are welcome.
 
 ## Screen Shot
-![alt tag] (https://raw.github.com/atorman/apexLimitEvents/master/samplePage.png)# apexLimitEvents
+![alt tag] (https://raw.github.com/atorman/apexLimitEvents/master/samplePage.png)
