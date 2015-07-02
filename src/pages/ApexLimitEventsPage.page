@@ -1,0 +1,463 @@
+<!-- 
+ * Copyright (c) 2012, Salesforce.com, Inc.  All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are
+ * met:
+ * 
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ * 
+ *   * Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in
+ *     the documentation and/or other materials provided with the
+ *     distribution.
+ * 
+ *   * Neither the name of Salesforce.com nor the names of its
+ *     contributors may be used to endorse or promote products derived
+ *     from this software without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+<apex:page controller="ApexLimitEventsController" sidebar="false"> 
+    <!-- Google API inclusion -->
+    <apex:includeScript id="a" value="https://www.google.com/jsapi" />
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    
+    <apex:sectionHeader title="Apex Limit Events + Platform Event Metrics" subtitle="Apex Limit Events "/><br/>
+      
+      <h1>To learn more about the Apex Limit Events Pilot, read the <a href="http://bit.ly/apexLimits" target="_blank">tip sheet</a>.</h1>
+      <apex:pageBlock title="Last 10 Apex Limit Events" id="LastTen">
+        <apex:dataTable value="{!ale}"
+                        var="lt"
+                        cellPadding="4" border="1">
+          <apex:column >
+            <apex:facet name="header" >Event Time</apex:facet>
+            {!lt.EventTime}
+          </apex:column>
+          <apex:column >
+            <apex:facet name="header" >Entry Point Name</apex:facet>
+            {!lt.EntryPointName}
+          </apex:column>
+          <apex:column >
+            <apex:facet name="header" >Entry Point Id</apex:facet>
+            {!lt.EntryPointId}
+          </apex:column>
+          <apex:column >
+            <apex:facet name="header" >Entry Point Type</apex:facet>
+            {!lt.EntryPointType}
+          </apex:column>
+          <apex:column >
+            <apex:facet name="header" >Apex Limit Type</apex:facet>
+            {!lt.LimitType}
+          </apex:column>
+          <apex:column >
+            <apex:facet name="header" >Limit Value (1.00 = 100%)</apex:facet>
+            {!lt.LimitValue}
+          </apex:column>
+          <apex:column >
+            <apex:facet name="header" >User Name</apex:facet>
+            {!lt.Username}
+          </apex:column>
+          <apex:column >
+            <apex:facet name="header" >User Id</apex:facet>
+            {!lt.UserId}
+          </apex:column>
+          <apex:column >
+            <apex:facet name="header" >Namespace Prefix</apex:facet>
+            {!lt.NamespacePrefix}
+          </apex:column>
+          <apex:column >
+             <apex:facet name="header" >Execution Identifier</apex:facet>
+            {!lt.ExecutionIdentifier}
+          </apex:column>
+        </apex:dataTable>
+      </apex:pageBlock>
+    <apex:pageBlock title="Apex Limit Event Metrics" id="ApexLimits">        
+        <!-- Google Charts will be drawn in this DIV -->
+        <div id="NumDistinctApexTxsChart" /><br/>
+        <div id="NumDistinctApexTxWithLimitsExceeding60Chart" /><br/>
+        <div id="NumDistinctApexTxLimitsExceeding60ByEntryPointNameChart" /><br/>
+        <div id="NumDistinctApexTxLimitsExceeding60ByLimitTypeChart" /><br/> 
+        <div id="AvgLimitValueByEntryPointNameChart" /><br/>  
+        <div id="AvgLimitValueByLimitTypeChart" /><br/>        
+    </apex:pageBlock>
+     
+    <script type="text/javascript">
+        // Load the Visualization API and the piechart package.
+        google.load('visualization', '1.1', {'packages':['corechart']});
+
+        // Set a callback to run when the Google Visualization API is loaded.
+        google.setOnLoadCallback(drawAll);   
+
+    	// call each individual charting function 
+        function drawAll(){
+            NumDistinctApexTxs();
+            NumDistinctApexTxWithLimitsExceeding60();
+            NumDistinctApexTxLimitsExceeding60ByEntryPointName();
+            AvgLimitValueByEntryPointName();
+            NumDistinctApexTxLimitsExceeding60ByLimitType();
+            AvgLimitValueByLimitType();
+           }
+        
+        // NumDistinctApexTxWithLimitsExceeding60 Time Series Chart
+        function NumDistinctApexTxs() {        
+          
+            // get the metric data from the Apex Controller:
+            ApexLimitEventsController.loadNumDistinctApexTxs( 
+                 function(result, event){  
+                     
+                     // load Column chart
+                     var visualization = new google.visualization.AreaChart(document.getElementById('NumDistinctApexTxsChart'));
+                     
+                     // prepare table model for chart with columns
+                     var data = new google.visualization.DataTable();
+                     data.addColumn('date', 'MetricTime');
+                     data.addColumn('number', 'MetricValue');
+                     
+                     // add rows from the remoting results
+                     for(var i =0; i<result.length;i++){
+                        var r = result[i];
+                        var myDate = new Date(r.MetricTime);
+                        data.addRow([myDate, r.MetricValue]); 
+                      }
+                    
+                    // all done, lets draw the chart with some options to make it look nice.
+                    visualization.draw(data, 
+                    {title:'Distinct Number of Apex Transactions',
+                     colors:['red'],
+                    legend : 
+                        {position: 'top', textStyle: 
+                            {color: 'red', fontSize: 10}
+                        }, 
+                        width:window.innerWidth,vAxis:
+                        {textStyle:{fontSize: 10}},
+                        hAxis:{
+                            textStyle:
+                                {fontSize: 10},
+                        showTextEvery:1,
+                        slantedText:false}
+                    });
+              }, {escape:true});
+          } 
+    
+        // NumDistinctApexTxWithLimitsExceeding60 Time Series Chart
+        function NumDistinctApexTxWithLimitsExceeding60() {        
+              ApexLimitEventsController.loadNumDistinctApexTxWithLimitsExceeding60( 
+                     function(result, event){  
+    
+                         // load Column chart
+                         var visualization = new google.visualization.AreaChart(document.getElementById('NumDistinctApexTxWithLimitsExceeding60Chart'));
+                         
+                         // prepare table model for chart with columns
+                         var data = new google.visualization.DataTable();
+                         data.addColumn('date', 'MetricTime');
+                         data.addColumn('number', 'MetricValue');
+                         
+                         // add rows from the remoting results
+                         for(var i =0; i<result.length;i++){
+                            var r = result[i];
+                            var myDate = new Date(r.MetricTime);
+                            data.addRow([myDate, r.MetricValue]); 
+                          }
+                        
+                        // all done, lets draw the chart with some options to make it look nice.
+                        visualization.draw(data, 
+                        {title:'Distinct Number Apex Transactions With Limits Exceeding 60% Threshold',
+                         colors:['red'],
+                        legend : 
+                            {position: 'top', textStyle: 
+                                {color: 'red', fontSize: 10}
+                            }, 
+                            width:window.innerWidth,vAxis:
+                            {textStyle:{fontSize: 10}},
+                            hAxis:{
+                                textStyle:
+                                    {fontSize: 10},
+                            showTextEvery:1,
+                            slantedText:false}
+                        });
+                  }, {escape:true});
+              }
+        
+    	// NumDistinctApexTxLimitsExceeding60ByEntryPointName Time Series Chart
+        function NumDistinctApexTxLimitsExceeding60ByEntryPointName() {         
+              
+              // get the metric data from the Apex Controller:
+              ApexLimitEventsController.loadNumDistinctApexTxWithLimitsExceeding60ByEntryPointName( 
+                     function(result, event){  
+                        
+                        // declare empty nested map objects
+                        var finalMap = {};
+                        var apexNames = {};
+                        
+                        // build the nested map object
+                        for (var i in result) {
+                            var elt = result[i];
+                            if (elt === undefined || elt.MetricTime === undefined) {
+                                continue;
+                            }
+    
+                            // if not null, add to it; if null build the first map object
+                            if(finalMap[elt.MetricTime] == undefined) {
+                                finalMap[elt.MetricTime] = {};
+                            }
+                            
+                            finalMap[elt.MetricTime][elt.AggregationFieldValue] = elt.MetricValue;
+    
+                            if (elt.AggregationFieldValue !== undefined){
+                                apexNames[elt.AggregationFieldValue] = 1;
+                                }
+                        }
+                        
+                         var visualization = new google.visualization.AreaChart(document.getElementById('NumDistinctApexTxLimitsExceeding60ByEntryPointNameChart'));
+                         
+                         // prepare table model for chart with columns
+                         var data = new google.visualization.DataTable();
+                         
+                         // build the columns for the chart based on nested map values
+                         data.addColumn('date', 'Date');
+                         for (var apexName in apexNames) {
+                             data.addColumn('number', apexName);
+                         }
+                         
+                         // add rows from the remoting results
+                         for(var key in finalMap){
+                             var row = [new Date(parseInt(key))];
+                             for (var apexName in apexNames) {
+                                 row.push(finalMap[key][apexName] || 0);
+                             }
+                             data.addRow(row);
+                          }  
+                        
+                        // all done, lets draw the chart with some options to make it look nice.
+                        visualization.draw(data, 
+                        {title:'Distinct Number Apex Transactions With Limits Exceeding 60% Threshold By Entry Point Name',
+                        legend : 
+                            {position: 'top', textStyle: 
+                                {color: 'red', fontSize: 10}
+                            }, 
+                            width:window.innerWidth,vAxis:
+                            {textStyle:{fontSize: 10}},
+                            hAxis:{
+                                textStyle:
+                                    {fontSize: 10},
+                            showTextEvery:1,
+                            slantedText:false}
+                        });
+                  }, {escape:true});
+              }
+        
+        // AvgLimitValueByEntryPointName Time Series Chart
+        function AvgLimitValueByEntryPointName() {         
+              
+              // get the metric data from the Apex Controller:
+              ApexLimitEventsController.loadAvgLimitValueByEntryPointName( 
+                     function(result, event){  
+                        
+                        // declare the empty nested map objects
+                        var finalMap = {};
+                        var apexNames = {};
+                        
+                        // build the nested map object
+                        for (var i in result) {
+                            var elt = result[i];
+                            if (elt === undefined || elt.MetricTime === undefined) {
+                                continue;
+                            }
+    
+                            // if not null, add to it; if null build the first map object
+                            if(finalMap[elt.MetricTime] == undefined) {
+                                finalMap[elt.MetricTime] = {};
+                            }
+                            
+                            finalMap[elt.MetricTime][elt.AggregationFieldValue] = elt.MetricValue;
+    
+                            if (elt.AggregationFieldValue !== undefined){
+                                apexNames[elt.AggregationFieldValue] = 1;
+                                }
+                        }
+                        
+                         var visualization = new google.visualization.AreaChart(document.getElementById('AvgLimitValueByEntryPointNameChart'));
+                         
+                         // prepare table model for chart with columns
+                         var data = new google.visualization.DataTable();
+                         
+                         // build the columns for the chart based on nested map values
+                         data.addColumn('date', 'Date');
+                         for (var apexName in apexNames) {
+                             data.addColumn('number', apexName);
+                         }
+                         
+                         // add rows from the remoting results
+                         for(var key in finalMap){
+                             var row = [new Date(parseInt(key))];
+                             for (var apexName in apexNames) {
+                                 row.push(finalMap[key][apexName] || 0);
+                             }
+                             data.addRow(row);
+                          }  
+                        
+                        // all done, lets draw the chart with some options to make it look nice.
+                        visualization.draw(data, 
+                        {title:'Average Limit Value By Entry Point Name',
+                        legend : 
+                            {position: 'top', textStyle: 
+                                {color: 'red', fontSize: 10}
+                            }, 
+                            width:window.innerWidth,vAxis:
+                            {textStyle:{fontSize: 10}},
+                            hAxis:{
+                                textStyle:
+                                    {fontSize: 10},
+                            showTextEvery:1,
+                            slantedText:false}
+                        });
+                  }, {escape:true});
+              }
+        
+        // NumDistinctApexTxLimitsExceeding60ByLimitType Time Series Chart
+        function NumDistinctApexTxLimitsExceeding60ByLimitType() {         
+             
+              // get the metric data from the Apex Controller:
+              ApexLimitEventsController.loadNumDistinctApexTxLimitsExceeding60ByLimitType( 
+                     function(result, event){  
+                        
+                        // declare the empty nested map objects
+                        var finalMap = {};
+                        var limitTypes = {};
+                        
+                        // build the nested map object
+                        for (var i in result) {
+                            var elt = result[i];
+                            if (elt === undefined || elt.MetricTime === undefined) {
+                                continue;
+                            }
+    
+                            // if not null, add to it; if null build the first map object
+                            if(finalMap[elt.MetricTime] == undefined) {
+                                finalMap[elt.MetricTime] = {};
+                            }
+                            
+                            finalMap[elt.MetricTime][elt.AggregationFieldValue] = elt.MetricValue;
+    
+                            if (elt.AggregationFieldValue !== undefined){
+                                limitTypes[elt.AggregationFieldValue] = 1;
+                                }
+                        }
+                        
+                         var visualization = new google.visualization.AreaChart(document.getElementById('NumDistinctApexTxLimitsExceeding60ByLimitTypeChart'));
+                         // prepare table model for chart with columns
+                         var data = new google.visualization.DataTable();
+                         
+                         // build the columns for the chart based on nested map values
+                         data.addColumn('date', 'Date');
+                         for (var limitType in limitTypes) {
+                             data.addColumn('number', limitType);
+                         }
+                         
+                         // add rows from the remoting results
+                         for(var key in finalMap){
+                             var row = [new Date(parseInt(key))];
+                             for (var limitType in limitTypes) {
+                                 row.push(finalMap[key][limitType] || 0);
+                             }
+                             data.addRow(row);
+                          }  
+                        
+                        // all done, lets draw the chart with some options to make it look nice.
+                        visualization.draw(data, 
+                        {title:'Distinct Number Apex Transactions With Limits Exceeding 60% Threshold By Limit Type',
+                        legend : 
+                            {position: 'top', textStyle: 
+                                {color: 'red', fontSize: 10}
+                            }, 
+                            width:window.innerWidth,vAxis:
+                            {textStyle:{fontSize: 10}},
+                            hAxis:{
+                                textStyle:
+                                    {fontSize: 10},
+                            showTextEvery:1,
+                            slantedText:false}
+                        });
+                  }, {escape:true});
+              }
+        
+        // AvgLimitValueByLimitType Time Series Chart
+        function AvgLimitValueByLimitType() {         
+              
+              // get the metric data from the Apex Controller:
+              ApexLimitEventsController.loadAvgLimitValueByLimitType( 
+                     function(result, event){  
+                        
+                        // declare the empty nested map objects
+                        var finalMap = {};
+                        var limitTypes = {};
+                        
+                        // build the nested map object
+                        for (var i in result) {
+                            var elt = result[i];
+                            if (elt === undefined || elt.MetricTime === undefined) {
+                                continue;
+                            }
+    
+                            // if not null, add to it; if null build the first map object
+                            if(finalMap[elt.MetricTime] == undefined) {
+                                finalMap[elt.MetricTime] = {};
+                            }
+                            
+                            finalMap[elt.MetricTime][elt.AggregationFieldValue] = elt.MetricValue;
+    
+                            if (elt.AggregationFieldValue !== undefined){
+                                limitTypes[elt.AggregationFieldValue] = 1;
+                                }
+                        }
+                        
+                         var visualization = new google.visualization.AreaChart(document.getElementById('AvgLimitValueByLimitTypeChart'));
+                         // prepare table model for chart with columns
+                         var data = new google.visualization.DataTable();
+                         
+                         // build the columns for the chart based on nested map values
+                         data.addColumn('date', 'Date');
+                         for (var limitType in limitTypes) {
+                             data.addColumn('number', limitType);
+                         }
+                         
+                         // add rows from the remoting results
+                         for(var key in finalMap){
+                             var row = [new Date(parseInt(key))];
+                             for (var limitType in limitTypes) {
+                                 row.push(finalMap[key][limitType] || 0);
+                             }
+                             data.addRow(row);
+                          }  
+                        
+                        // all done, lets draw the chart with some options to make it look nice.
+                        visualization.draw(data, 
+                        {title:'Average Limit Value By Limit Type',
+                        legend : 
+                            {position: 'top', textStyle: 
+                                {color: 'red', fontSize: 10}
+                            }, 
+                            width:window.innerWidth,vAxis:
+                            {textStyle:{fontSize: 10}},
+                            hAxis:{
+                                textStyle:
+                                    {fontSize: 10},
+                            showTextEvery:1,
+                            slantedText:false}
+                        });
+                  }, {escape:true});
+              }
+    </script>
+</apex:page>
