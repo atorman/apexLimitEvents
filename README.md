@@ -30,8 +30,6 @@ To learn more specifics about the Apex Limit Events Pilot functionality, read th
 
 ## Installation
 
-The majority of 
-
 The easiest way to install this project into your org is to make use of the workbench tool (http://workbench.developerforce.com).  
 
 1. Download a ZIP of the repository. 
