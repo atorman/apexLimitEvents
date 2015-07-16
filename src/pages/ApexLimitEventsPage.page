@@ -37,49 +37,49 @@
     <apex:sectionHeader title="Apex Limit Events + Platform Event Metrics" subtitle="Apex Limit Events "/><br/>
       
       <h1>To learn more about the Apex Limit Events Pilot, read the <a href="http://bit.ly/apexLimits" target="_blank">tip sheet</a>.</h1>
-      <apex:pageBlock title="Last 10 Apex Limit Events" id="LastTen">
+      <apex:pageBlock title="Today's Apex Limit Events" id="TodaysEvents">
         <apex:dataTable value="{!ale}"
-                        var="lt"
+                        var="te"
                         cellPadding="4" border="1">
           <apex:column >
             <apex:facet name="header" >Event Time</apex:facet>
-            {!lt.EventTime}
+            {!te.EventTime}
           </apex:column>
           <apex:column >
             <apex:facet name="header" >Entry Point Name</apex:facet>
-            {!lt.EntryPointName}
+            {!te.EntryPointName}
           </apex:column>
           <apex:column >
             <apex:facet name="header" >Entry Point Id</apex:facet>
-            {!lt.EntryPointId}
+            {!te.EntryPointId}
           </apex:column>
           <apex:column >
             <apex:facet name="header" >Entry Point Type</apex:facet>
-            {!lt.EntryPointType}
+            {!te.EntryPointType}
           </apex:column>
           <apex:column >
             <apex:facet name="header" >Apex Limit Type</apex:facet>
-            {!lt.LimitType}
+            {!te.LimitType}
           </apex:column>
           <apex:column >
             <apex:facet name="header" >Limit Value (1.00 = 100%)</apex:facet>
-            {!lt.LimitValue}
+            {!te.LimitValue}
           </apex:column>
           <apex:column >
             <apex:facet name="header" >User Name</apex:facet>
-            {!lt.Username}
+            {!te.Username}
           </apex:column>
           <apex:column >
             <apex:facet name="header" >User Id</apex:facet>
-            {!lt.UserId}
+            {!te.UserId}
           </apex:column>
           <apex:column >
             <apex:facet name="header" >Namespace Prefix</apex:facet>
-            {!lt.NamespacePrefix}
+            {!te.NamespacePrefix}
           </apex:column>
           <apex:column >
              <apex:facet name="header" >Execution Identifier</apex:facet>
-            {!lt.ExecutionIdentifier}
+            {!te.ExecutionIdentifier}
           </apex:column>
         </apex:dataTable>
       </apex:pageBlock>
@@ -137,7 +137,7 @@
                     {title:'Distinct Number of Apex Transactions',
                      colors:['red'],
                     legend : 
-                        {position: 'top', textStyle: 
+                        {position: 'bottom', textStyle: 
                             {color: 'red', fontSize: 10}
                         }, 
                         width:window.innerWidth,vAxis:

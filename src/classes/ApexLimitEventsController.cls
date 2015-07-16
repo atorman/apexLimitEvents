@@ -32,6 +32,15 @@
 global with sharing class ApexLimitEventsController {
     
    public List<ApexLimitEvent> ale{get;set;}
+    
+   // used for the last 10 apex method invocations
+    public ApexLimitEventsController() {
+    	ale = [SELECT EntryPointId,EntryPointName,EntryPointType,EventTime,ExecutionIdentifier,Id,LimitType,LimitValue,NamespacePrefix,UserId,Username 
+               FROM ApexLimitEvent 
+               WHERE EventTime > Yesterday
+               LIMIT 10
+               ];
+   }
   
    // used for the NumDistinctApexTxs MetricType  
    @RemoteAction   
@@ -40,7 +49,7 @@ global with sharing class ApexLimitEventsController {
             WHERE EventType='ApexLimitEvent'
             AND MetricType='NumDistinctApexTxs'
             AND MetricTime = Last_n_Days:7
-            ORDER BY MetricTime DESC NULLS FIRST ];
+            ];
     }  
     
     // used for the NumDistinctApexTxWithLimitsExceeding60 MetricType  
@@ -50,7 +59,7 @@ global with sharing class ApexLimitEventsController {
             WHERE EventType='ApexLimitEvent'
             AND MetricType='NumDistinctApexTxWithLimitsExceeding60'
             AND MetricTime = Last_n_Days:7
-            ORDER BY MetricTime DESC NULLS FIRST ];
+            ];
     }
     
     // used for the NumDistinctApexTxLimitsExceeding60ByEntryPointName MetricType 
@@ -60,7 +69,7 @@ global with sharing class ApexLimitEventsController {
             WHERE EventType='ApexLimitEvent'
             AND MetricType='NumDistinctApexTxLimitsExceeding60ByEntryPointName'
             AND MetricTime = Last_n_Days:7
-            ORDER BY MetricTime DESC NULLS FIRST ];
+            ];
     }
     
     // used for the AvgLimitValueByEntryPointName MetricType 
@@ -70,7 +79,7 @@ global with sharing class ApexLimitEventsController {
             WHERE EventType='ApexLimitEvent'
             AND MetricType='AvgLimitValueByEntryPointName'
             AND MetricTime = Last_n_Days:7
-            ORDER BY MetricTime DESC NULLS FIRST ];
+            ];
     }
     
     // used for the NumDistinctApexTxLimitsExceeding60ByLimitType  MetricType 
@@ -80,7 +89,7 @@ global with sharing class ApexLimitEventsController {
             WHERE EventType = 'ApexLimitEvent' 
             AND MetricTime = Last_n_Days:7 
             AND MetricType = 'NumDistinctApexTxLimitsExceeding60ByLimitType' 
-            ORDER BY MetricTime DESC NULLS FIRST ];
+            ];
     }
     // used for the AvgLimitValueByLimitType  MetricType 
     @RemoteAction   
@@ -89,12 +98,6 @@ global with sharing class ApexLimitEventsController {
             WHERE EventType = 'ApexLimitEvent' 
             AND MetricTime = Last_n_Days:7 
             AND MetricType = 'AvgLimitValueByLimitType' 
-            ORDER BY MetricTime DESC NULLS FIRST ];
+            ];
     }
-    // used for the last 10 apex method invocations
-    public ApexLimitEventsController() {
-    	ale = [SELECT EntryPointId,EntryPointName,EntryPointType,EventTime,ExecutionIdentifier,Id,LimitType,LimitValue,NamespacePrefix,UserId,Username 
-               FROM ApexLimitEvent 
-               ORDER BY EventTime DESC NULLS FIRST LIMIT 10 ];
-  }
 }
