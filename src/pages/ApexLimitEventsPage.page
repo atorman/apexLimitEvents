@@ -42,8 +42,8 @@
                         var="te"
                         cellPadding="4" border="1">
           <apex:column >
-            <apex:facet name="header" >Event Time</apex:facet>
-            {!te.EventTime}
+            <apex:facet name="header" >Event Date</apex:facet>
+            {!te.EventDate}
           </apex:column>
           <apex:column >
             <apex:facet name="header" >Entry Point Name</apex:facet>
@@ -100,7 +100,7 @@
         // Set a callback to run when the Google Visualization API is loaded.
         google.setOnLoadCallback(drawAll);   
 
-    	// call each individual charting function 
+        // call each individual charting function 
         function drawAll(){
             NumDistinctApexTxs();
             NumDistinctApexTxWithLimitsExceeding60();
@@ -122,13 +122,13 @@
                      
                      // prepare table model for chart with columns
                      var data = new google.visualization.DataTable();
-                     data.addColumn('date', 'MetricTime');
+                     data.addColumn('date', 'MetricDate');
                      data.addColumn('number', 'MetricValue');
                      
                      // add rows from the remoting results
                      for(var i =0; i<result.length;i++){
                         var r = result[i];
-                        var myDate = new Date(r.MetricTime);
+                        var myDate = new Date(r.MetricDate);
                         data.addRow([myDate, r.MetricValue]); 
                       }
                     
@@ -161,13 +161,13 @@
                          
                          // prepare table model for chart with columns
                          var data = new google.visualization.DataTable();
-                         data.addColumn('date', 'MetricTime');
+                         data.addColumn('date', 'MetricDate');
                          data.addColumn('number', 'MetricValue');
                          
                          // add rows from the remoting results
                          for(var i =0; i<result.length;i++){
                             var r = result[i];
-                            var myDate = new Date(r.MetricTime);
+                            var myDate = new Date(r.MetricDate);
                             data.addRow([myDate, r.MetricValue]); 
                           }
                         
@@ -190,7 +190,7 @@
                   }, {escape:true});
               }
         
-    	// NumDistinctApexTxLimitsExceeding60ByEntryPointName Time Series Chart
+        // NumDistinctApexTxLimitsExceeding60ByEntryPointName Time Series Chart
         function NumDistinctApexTxLimitsExceeding60ByEntryPointName() {         
               
               // get the metric data from the Apex Controller:
@@ -204,16 +204,16 @@
                         // build the nested map object
                         for (var i in result) {
                             var elt = result[i];
-                            if (elt === undefined || elt.MetricTime === undefined) {
+                            if (elt === undefined || elt.MetricDate === undefined) {
                                 continue;
                             }
     
                             // if not null, add to it; if null build the first map object
-                            if(finalMap[elt.MetricTime] == undefined) {
-                                finalMap[elt.MetricTime] = {};
+                            if(finalMap[elt.MetricDate] == undefined) {
+                                finalMap[elt.MetricDate] = {};
                             }
                             
-                            finalMap[elt.MetricTime][elt.AggregationFieldValue] = elt.MetricValue;
+                            finalMap[elt.MetricDate][elt.AggregationFieldValue] = elt.MetricValue;
     
                             if (elt.AggregationFieldValue !== undefined){
                                 apexNames[elt.AggregationFieldValue] = 1;
@@ -272,16 +272,16 @@
                         // build the nested map object
                         for (var i in result) {
                             var elt = result[i];
-                            if (elt === undefined || elt.MetricTime === undefined) {
+                            if (elt === undefined || elt.MetricDate === undefined) {
                                 continue;
                             }
     
                             // if not null, add to it; if null build the first map object
-                            if(finalMap[elt.MetricTime] == undefined) {
-                                finalMap[elt.MetricTime] = {};
+                            if(finalMap[elt.MetricDate] == undefined) {
+                                finalMap[elt.MetricDate] = {};
                             }
                             
-                            finalMap[elt.MetricTime][elt.AggregationFieldValue] = elt.MetricValue;
+                            finalMap[elt.MetricDate][elt.AggregationFieldValue] = elt.MetricValue;
     
                             if (elt.AggregationFieldValue !== undefined){
                                 apexNames[elt.AggregationFieldValue] = 1;
@@ -340,16 +340,16 @@
                         // build the nested map object
                         for (var i in result) {
                             var elt = result[i];
-                            if (elt === undefined || elt.MetricTime === undefined) {
+                            if (elt === undefined || elt.MetricDate === undefined) {
                                 continue;
                             }
     
                             // if not null, add to it; if null build the first map object
-                            if(finalMap[elt.MetricTime] == undefined) {
-                                finalMap[elt.MetricTime] = {};
+                            if(finalMap[elt.MetricDate] == undefined) {
+                                finalMap[elt.MetricDate] = {};
                             }
                             
-                            finalMap[elt.MetricTime][elt.AggregationFieldValue] = elt.MetricValue;
+                            finalMap[elt.MetricDate][elt.AggregationFieldValue] = elt.MetricValue;
     
                             if (elt.AggregationFieldValue !== undefined){
                                 limitTypes[elt.AggregationFieldValue] = 1;
@@ -407,16 +407,16 @@
                         // build the nested map object
                         for (var i in result) {
                             var elt = result[i];
-                            if (elt === undefined || elt.MetricTime === undefined) {
+                            if (elt === undefined || elt.MetricDate === undefined) {
                                 continue;
                             }
     
                             // if not null, add to it; if null build the first map object
-                            if(finalMap[elt.MetricTime] == undefined) {
-                                finalMap[elt.MetricTime] = {};
+                            if(finalMap[elt.MetricDate] == undefined) {
+                                finalMap[elt.MetricDate] = {};
                             }
                             
-                            finalMap[elt.MetricTime][elt.AggregationFieldValue] = elt.MetricValue;
+                            finalMap[elt.MetricDate][elt.AggregationFieldValue] = elt.MetricValue;
     
                             if (elt.AggregationFieldValue !== undefined){
                                 limitTypes[elt.AggregationFieldValue] = 1;

@@ -35,9 +35,9 @@ global with sharing class ApexLimitEventsController {
     
    // used for the last 10 apex method invocations
     public ApexLimitEventsController() {
-    	ale = [SELECT EntryPointId,EntryPointName,EntryPointType,EventTime,ExecutionIdentifier,Id,LimitType,LimitValue,NamespacePrefix,UserId,Username 
+        ale = [SELECT EntryPointId,EntryPointName,EntryPointType,EventDate,ExecutionIdentifier,Id,LimitType,LimitValue,NamespacePrefix,UserId,Username 
                FROM ApexLimitEvent 
-               WHERE EventTime > Yesterday
+               WHERE EventDate > Yesterday
                LIMIT 10
                ];
    }
@@ -45,58 +45,52 @@ global with sharing class ApexLimitEventsController {
    // used for the NumDistinctApexTxs MetricType  
    @RemoteAction   
     global static PlatformEventMetrics[] loadNumDistinctApexTxs() {
-        return [SELECT MetricTime, MetricValue FROM PlatformEventMetrics
-            WHERE EventType='ApexLimitEvent'
-            AND MetricType='NumDistinctApexTxs'
-            AND MetricTime = Last_n_Days:7
+        return [SELECT MetricDate, MetricValue FROM PlatformEventMetrics
+            WHERE MetricType='NumDistinctApexTxs'
+            AND MetricDate = Last_n_Days:7
             ];
     }  
     
     // used for the NumDistinctApexTxWithLimitsExceeding60 MetricType  
    @RemoteAction   
     global static PlatformEventMetrics[] loadNumDistinctApexTxWithLimitsExceeding60() {
-        return [SELECT MetricTime, MetricValue FROM PlatformEventMetrics
-            WHERE EventType='ApexLimitEvent'
-            AND MetricType='NumDistinctApexTxWithLimitsExceeding60'
-            AND MetricTime = Last_n_Days:7
+        return [SELECT MetricDate, MetricValue FROM PlatformEventMetrics
+            WHERE MetricType='NumDistinctApexTxWithLimitsExceeding60'
+            AND MetricDate = Last_n_Days:7
             ];
     }
     
     // used for the NumDistinctApexTxLimitsExceeding60ByEntryPointName MetricType 
     @RemoteAction   
     global static PlatformEventMetrics[] loadNumDistinctApexTxWithLimitsExceeding60ByEntryPointName() {
-        return [SELECT MetricTime, MetricValue, AggregationFieldValue FROM PlatformEventMetrics
-            WHERE EventType='ApexLimitEvent'
-            AND MetricType='NumDistinctApexTxLimitsExceeding60ByEntryPointName'
-            AND MetricTime = Last_n_Days:7
+        return [SELECT MetricDate, MetricValue, AggregationFieldValue FROM PlatformEventMetrics
+            WHERE MetricType='NumDistinctApexTxLimitsExceeding60ByEntryPointName'
+            AND MetricDate = Last_n_Days:7
             ];
     }
     
     // used for the AvgLimitValueByEntryPointName MetricType 
     @RemoteAction   
     global static PlatformEventMetrics[] loadAvgLimitValueByEntryPointName() {
-        return [SELECT MetricTime, MetricValue, AggregationFieldValue FROM PlatformEventMetrics
-            WHERE EventType='ApexLimitEvent'
-            AND MetricType='AvgLimitValueByEntryPointName'
-            AND MetricTime = Last_n_Days:7
+        return [SELECT MetricDate, MetricValue, AggregationFieldValue FROM PlatformEventMetrics
+            WHERE MetricType='AvgLimitValueByEntryPointName'
+            AND MetricDate = Last_n_Days:7
             ];
     }
     
     // used for the NumDistinctApexTxLimitsExceeding60ByLimitType  MetricType 
     @RemoteAction   
     global static PlatformEventMetrics[] loadNumDistinctApexTxLimitsExceeding60ByLimitType () {
-        return [SELECT MetricTime, MetricValue, AggregationFieldValue FROM PlatformEventMetrics
-            WHERE EventType = 'ApexLimitEvent' 
-            AND MetricTime = Last_n_Days:7 
+        return [SELECT MetricDate, MetricValue, AggregationFieldValue FROM PlatformEventMetrics
+            WHERE MetricDate = Last_n_Days:7 
             AND MetricType = 'NumDistinctApexTxLimitsExceeding60ByLimitType' 
             ];
     }
     // used for the AvgLimitValueByLimitType  MetricType 
     @RemoteAction   
     global static PlatformEventMetrics[] loadAvgLimitValueByLimitType () {
-        return [SELECT MetricTime, MetricValue, AggregationFieldValue FROM PlatformEventMetrics
-            WHERE EventType = 'ApexLimitEvent' 
-            AND MetricTime = Last_n_Days:7 
+        return [SELECT MetricDate, MetricValue, AggregationFieldValue FROM PlatformEventMetrics
+            WHERE MetricDate = Last_n_Days:7 
             AND MetricType = 'AvgLimitValueByLimitType' 
             ];
     }
