@@ -38,10 +38,10 @@
 '''
 # Configurations - change to fit your org
 
-CLIENT_ID = '3MVG99OxTyEMCQ3hSjz15qIUWtPCqrVmP0zgjlnvd_9umRj_Q3OpBkjCPh5_ZkICTqzdRR2JJ_Iq96kRSQA3h'
-CLIENT_SECRET = '8808204001491012961'
-USERNAME = 'user@company.com'
-PASSWORD = 'passw0rd'
+CLIENT_ID = '<this code won\'t work until you add your salesforce connected app client id here>'
+CLIENT_SECRET = '<this code won\'t work until you add your salesforce connected app client secret here>'
+USERNAME = '<this code won\'t work until you add your salesforce username here>'
+PASSWORD = 'this code won\'t work until you add your salesforce password here'
 
 #Imports
 
